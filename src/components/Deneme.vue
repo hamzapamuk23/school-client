@@ -1,5 +1,6 @@
 <template>
     <div>
+        <h1>Okul Tablosu</h1>
         <table>
             <tr>
                 <th>Adı</th>
@@ -7,15 +8,33 @@
                 <th>Durumu</th>
                 <th>Operasyonlar</th>
             </tr>
+            <tr>
+                <td>
+                    <input
+                        type="text"
+                        v-model="school.name"
+                        placeholder="Adı"
+                    />
+                </td>
+                <td>
+                    <input
+                        type="text"
+                        v-model="school.code"
+                        placeholder="Kodu"
+                    />
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
             <tr v-for="(school, index) in schools" :key="school.id">
                 <td>{{ school.name }}</td>
                 <td>{{ school.code }}</td>
                 <td>{{ school.active }}</td>
                 <td>
-                    <button type="button" @click="deleteSchool(index)">
+                    <button type="button" @click="deleteSchool(school.id)">
                         Sil
                     </button>
-                    <button type="button" @click="updateSchool(index)">
+                    <button type="button" @click="inputUpdate(index)">
                         Güncelle
                     </button>
                 </td>
@@ -23,19 +42,20 @@
         </table>
 
         <form>
-            <input v-show="false" v-model="schoolId" />
+            <input v-show="false" v-model="school.id" />
             <input
                 type="text"
-                v-model="schoolName"
+                v-model="school.name"
                 placeholder="Ad giriniz"
                 required
             />
             <input
                 type="text"
-                v-model="schoolCode"
+                v-model="school.code"
                 placeholder="Kod giriniz"
                 required
             />
+            <input type="checkbox" v-model="school.active" checked="false" />
             <button type="text" @click="saveSchool()">Kaydet</button>
             <button type="text" @click="clean()">Temizle</button>
         </form>
@@ -45,30 +65,22 @@
 <script>
 export default {
     data: () => ({
-        schoolId: null,
-        schoolName: '',
-        schoolCode: '',
-        schools: [
-            { id: 1, name: 'Fırat Üniversitesi', code: 'FÜ', active: true },
-            { id: 2, name: 'İnönü Üniversitesi', code: 'İÜ', active: true },
-            {
-                id: 3,
-                name: 'Cumhuriyet Üniversitesi',
-                code: 'SCÜ',
-                active: true,
-            },
-        ],
+        school: { id: null, name: '', code: '' },
+        schools: [],
+        options: { size: 2, totalElements: 0, totalPages: 0 },
+        page: 0,
     }),
 
     methods: {
-        deleteSchool(index) {
-            this.schools.splice(index, 1)
+        async deleteSchool(id) {
+            await this.axios.delete('http://localhost:8080/school/' + id)
+            this.getSchoolList()
         },
 
-        updateSchool(index) {
-            this.schoolId = this.schools[index].id
-            this.schoolName = this.schools[index].name
-            this.schoolCode = this.schools[index].code
+        inputUpdate(index) {
+            this.school.id = this.schools[index].id
+            this.school.name = this.schools[index].name
+            this.school.code = this.schools[index].code
         },
 
         clean() {
@@ -78,26 +90,50 @@ export default {
         },
 
         saveSchool() {
-            if (this.schoolId === null || this.schoolId === '') {
+            if (this.school.id === null || this.school.id === '') {
                 alert('added')
-                // this.addStudent();
-                // this.getList();
+                this.addSchool()
+                this.getSchoolList()
             } else {
                 alert('updated')
-                // this.updateStudent();
-                // this.getList();
+                this.updateSchool()
+                this.getSchoolList()
             }
         },
 
-        getList() {
-            this.axios
-                .get('http://localhost:8080/school')
-                .then((response) => (this.schools = response))
+        async updateSchool() {
+            await this.axios.put(
+                'http://localhost:8080/school/' + this.school.id,
+                this.school
+            )
+            this.getSchoolList()
         },
 
-        mounted() {
-            this.getList()
+        async addSchool() {
+            await this.axios.post('http://localhost:8080/school/', this.school)
+            this.getSchoolList()
         },
+
+        async getSchoolList() {
+            await this.axios
+                .get(
+                    'http://localhost:8080/school/search/findBySchoolName?name=' +
+                        this.school.name +
+                        '&code=' +
+                        this.school.code +
+                        '&page=' +
+                        this.page +
+                        '&size=' +
+                        this.options.size
+                )
+                .then(
+                    (response) =>
+                        (this.schools = response.data._embedded.schools)
+                )
+        },
+    },
+    mounted() {
+        this.getSchoolList()
     },
 }
 </script>

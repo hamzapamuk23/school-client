@@ -2,18 +2,18 @@
     <div id="app">
         <!-- <img alt="Vue logo" src="./assets/logo.png" /> -->
         <!-- <HelloWorld msg="Merhaba Hamza" /> -->
-        <deneme></deneme>
+        <Deneme></Deneme>
     </div>
 </template>
 
 <script>
 // import HelloWorld from './components/HelloWorld.vue'
-import deneme from './components/Deneme.vue'
+import Deneme from './components/Deneme.vue'
 export default {
     name: 'App',
     components: {
         // HelloWorld,
-        deneme,
+        Deneme,
     },
 }
 </script>
