@@ -29,12 +29,12 @@
                     <td></td>
                     <td></td>
                 </tr>
-                <tr v-for="(school, index) in schools" :key="school.id">
-                    <td>{{ school.name }}</td>
-                    <td>{{ school.code }}</td>
-                    <td>{{ school.active }}</td>
+                <tr v-for="(val, index) in schools" :key="val.id">
+                    <td>{{ val.name }}</td>
+                    <td>{{ val.code }}</td>
+                    <td>{{ val.active }}</td>
                     <td>
-                        <button type="button" @click="deleteSchool(school.id)">
+                        <button type="button" @click="deleteSchool(val.id)">
                             Sil
                         </button>
                         <button type="button" @click="inputUpdate(index)">
@@ -88,7 +88,7 @@
 export default {
     data: () => ({
         schoolSearch: { name: '', code: '' },
-        school: { id: null, name: '', code: '' },
+        school: { id: null, name: '', code: '', active: false },
         schools: [],
         options: { size: 5, totalElements: 0, totalPages: 0 },
         page: 0,
@@ -104,13 +104,14 @@ export default {
             this.school.id = this.schools[index].id
             this.school.name = this.schools[index].name
             this.school.code = this.schools[index].code
+            this.school.active = this.schools[index].active
         },
 
         clean() {
-            console.log('clean ')
             this.school.id = ''
             this.school.name = ''
             this.school.code = ''
+            this.school.active = false
         },
 
         saveSchool(e) {
@@ -120,6 +121,7 @@ export default {
                 alert('added')
                 this.addSchool()
                 this.getSchoolList()
+                this.clean()
             } else {
                 alert('updated')
                 this.updateSchool()
