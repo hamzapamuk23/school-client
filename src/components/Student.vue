@@ -161,9 +161,14 @@ export default {
         schools: [],
         selectedStudent: { id: null, name: '', school: { id: null } },
         students: [],
-        options: { size: 2, totalElements: 0, totalPages: 0, sort: 0 },
+        options: { size: 2, totalElements: 0, totalPages: 0 },
         page: 0,
     }),
+
+    mounted() {
+        this.getStudentList()
+        this.getSchoolList()
+    },
 
     methods: {
         async getStudentList() {
@@ -184,9 +189,7 @@ export default {
                         '&size=' +
                         this.options.size +
                         '&page=' +
-                        this.page +
-                        '&sort=' +
-                        this.sort
+                        this.page
                 )
                 .then(
                     (response) => (
@@ -196,7 +199,7 @@ export default {
                 )
         },
 
-        async getSchooltList() {
+        async getSchoolList() {
             await this.axios
                 .get('http://localhost:8080/school/search/findByActiveTrue')
                 .then(
@@ -214,6 +217,15 @@ export default {
             }
         },
 
+        async addStudent() {
+            await this.axios.post(
+                'http://localhost:8080/student',
+                this.selectedStudent
+            )
+            this.getStudentList()
+            this.cleanForm()
+        },
+
         inputUpdate(index) {
             this.selectedStudent.id = this.students[index].id
             this.selectedStudent.name = this.students[index].name
@@ -224,8 +236,13 @@ export default {
             this.selectedStudent.school = this.students[index].school
         },
 
-        cleanForm() {
-            this.selectedStudent = { id: null, name: '', school: { id: null } }
+        async updateStudent() {
+            await this.axios.put(
+                'http://localhost:8080/student/' + this.selectedStudent.id,
+                this.selectedStudent
+            )
+            this.getStudentList()
+            this.cleanForm()
         },
 
         async deleteStudent(id) {
@@ -233,23 +250,8 @@ export default {
             this.getStudentList()
         },
 
-        async addStudent() {
-            await this.axios.post(
-                'http://localhost:8080/student',
-                this.selectedStudent
-            )
-            this.getStudentList()
-            this.cleanForm()
-        },
-
-        async updateStudent() {
-            console.log()
-            await this.axios.put(
-                'http://localhost:8080/student/' + this.selectedStudent.id,
-                this.selectedStudent
-            )
-            this.getStudentList()
-            this.cleanForm()
+        cleanForm() {
+            this.selectedStudent = { id: null, name: '', school: { id: null } }
         },
 
         changePage(event) {
@@ -262,13 +264,7 @@ export default {
                 this.page--
             }
             this.getStudentList()
-            console.log(event.path[0].id)
         },
-    },
-
-    mounted() {
-        this.getStudentList()
-        this.getSchooltList()
     },
 }
 </script>

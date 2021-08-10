@@ -94,54 +94,11 @@ export default {
         page: 0,
     }),
 
+    mounted() {
+        this.getSchoolList()
+    },
+
     methods: {
-        async deleteSchool(id) {
-            await this.axios.delete('http://localhost:8080/school/' + id)
-            this.getSchoolList()
-        },
-
-        inputUpdate(index) {
-            this.school.id = this.schools[index].id
-            this.school.name = this.schools[index].name
-            this.school.code = this.schools[index].code
-            this.school.active = this.schools[index].active
-        },
-
-        clean() {
-            this.school.id = ''
-            this.school.name = ''
-            this.school.code = ''
-            this.school.active = false
-        },
-
-        saveSchool(e) {
-            e.preventDefault()
-            console.log('saveSchool çalıştı...')
-            if (this.school.id === null || this.school.id === '') {
-                alert('added')
-                this.addSchool()
-                this.getSchoolList()
-                this.clean()
-            } else {
-                alert('updated')
-                this.updateSchool()
-                this.getSchoolList()
-            }
-        },
-
-        async updateSchool() {
-            await this.axios.put(
-                'http://localhost:8080/school/' + this.school.id,
-                this.school
-            )
-            this.getSchoolList()
-        },
-
-        async addSchool() {
-            await this.axios.post('http://localhost:8080/school/', this.school)
-            this.getSchoolList()
-        },
-
         async getSchoolList() {
             await this.axios
                 .get(
@@ -162,6 +119,52 @@ export default {
                 )
         },
 
+        saveSchool(e) {
+            e.preventDefault()
+            if (this.school.id === null || this.school.id === '') {
+                alert('added')
+                this.addSchool()
+                this.getSchoolList()
+                this.clean()
+            } else {
+                alert('updated')
+                this.updateSchool()
+                this.getSchoolList()
+            }
+        },
+
+        async addSchool() {
+            await this.axios.post('http://localhost:8080/school/', this.school)
+            this.getSchoolList()
+        },
+
+        inputUpdate(index) {
+            this.school.id = this.schools[index].id
+            this.school.name = this.schools[index].name
+            this.school.code = this.schools[index].code
+            this.school.active = this.schools[index].active
+        },
+
+        async updateSchool() {
+            await this.axios.put(
+                'http://localhost:8080/school/' + this.school.id,
+                this.school
+            )
+            this.getSchoolList()
+        },
+
+        async deleteSchool(id) {
+            await this.axios.delete('http://localhost:8080/school/' + id)
+            this.getSchoolList()
+        },
+
+        clean() {
+            this.school.id = ''
+            this.school.name = ''
+            this.school.code = ''
+            this.school.active = false
+        },
+
         changePage(event) {
             if (
                 event.path[0].id === 'nextBtn' &&
@@ -172,11 +175,7 @@ export default {
                 this.page--
             }
             this.getSchoolList()
-            console.log(event.path[0].id)
         },
-    },
-    mounted() {
-        this.getSchoolList()
     },
 }
 </script>
